@@ -1,18 +1,21 @@
-from google import genai
 import os
+from openai import OpenAI
 
 def call_llm(prompt: str) -> str:
-    client = genai.Client(
-        api_key=os.getenv("GEMINI_API_KEY", ""),
+    """
+    Call OpenAI's GPT-4o model using your API key from environment variable OPENAI_API_KEY.
+    """
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+
+    response = client.chat.completions.create(
+        model="gpt-4o",  # you can also use "gpt-4-turbo" if you prefer
+        messages=[{"role": "user", "content": prompt}]
     )
-    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-    response = client.models.generate_content(model=model, contents=[prompt])
-    return response.text
+
+    return response.choices[0].message.content
+
 
 if __name__ == "__main__":
     test_prompt = "Hello, how are you?"
-
-    # First call - should hit the API
     print("Making call...")
-    response1 = call_llm(test_prompt, use_cache=False)
-    print(f"Response: {response1}")
+    print(call_llm(test_prompt))
